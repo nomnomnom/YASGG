@@ -7,8 +7,6 @@ from setuptools import find_packages, findall
 version = __import__('yasgg').get_version()
 read = lambda filepath: codecs.open(filepath, 'r', 'utf-8').read()
 
-print findall('yasgg/themes/')
-
 setup(
     name='YASGG',
     version=version,

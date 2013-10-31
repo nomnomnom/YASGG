@@ -14,7 +14,7 @@ Dropbox, Google Drive and so on with no privacy concerns.
 
 ## Demo
 
-* Link: http://github.io/nomnomnom/yasgg-demo/
+* Link: http://nomnomnom.github.io/yasgg/
 * Password: 21f3a7f6373ccb42631b5671db4f5a5a60aed6dedf8e7b71d27e55288f41f6dc
 
 ## Features
