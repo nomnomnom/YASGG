@@ -4,7 +4,7 @@ import logging
 from tendo import colorer
 
 
-VERSION = (0, 0, 1, 'dev', 1)
+VERSION = (0, 1, 0, 'final', 1)
 LOG_LEVEL = logging.DEBUG
 
 
