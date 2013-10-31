@@ -1,0 +1,9 @@
+.idea/
+.DS_Store
+*.pyc
+/virtualenv/
+.project
+tests/
+build/
+dist/
+YASGG.egg-info/

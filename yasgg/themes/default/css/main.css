@@ -1,0 +1,61 @@
+a {
+    color: rgb(204, 204, 204);
+    font-size: 12px;
+}
+
+#password-dialog {
+    position: relative;
+    padding: 20px;
+    width: auto;
+    max-width: 500px;
+    margin: 20px auto;
+    background: rgb(74, 77, 78);
+}
+
+img.loading {
+    display: block;
+    background-image: url(../img/ajax-loader.gif);
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 0;
+}
+
+img {
+    border: 0px;
+}
+
+.thumbnail-container {
+    margin-bottom: 6px;
+    margin-right: 6px;
+}
+
+.hide {
+    display: None;
+}
+
+.lightbox-close {
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    padding: 0;
+    z-index: 1046;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    color: white;
+}
+
+@media screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) {
+    #content {
+        margin-left: 6px;
+    }
+
+    .thumbnail-img.screen-small {
+        width: auto;
+        height: auto;
+        max-width:100%;
+        max-height:100%;
+    }
+}
