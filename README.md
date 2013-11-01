@@ -33,6 +33,7 @@ Dropbox, Google Drive and so on with no privacy concerns.
 ### Prebuilt binaries (there is a yasggctl binary inside the zip. Run it from the command-line.)
 
 * OS X [64 bit](https://raw.github.com/nomnomnom/yasgg/master/releases/v0.1.0/osx_64/yasggctl.zip)
+* Linux [64 bit](https://raw.github.com/nomnomnom/yasgg/master/releases/v0.1.0/linux_64/yasggctl.zip)
 
 ### From source
 
