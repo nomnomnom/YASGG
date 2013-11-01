@@ -30,8 +30,9 @@ If you know python pip, pip this is the recommended way to install. Otherwise ch
 
 ### Prebuilt binaries (there is a yasggctl binary inside the zip. Run it from the command-line.)
 
-* [OS X 64 bit](https://raw.github.com/nomnomnom/yasgg/master/releases/v0.1.0/osx_64/yasggctl.zip)
-* [Linux 64 bit](https://raw.github.com/nomnomnom/yasgg/master/releases/v0.1.0/linux_64/yasggctl.zip)
+* [Windows](http://nomnomnom.github.io/YASGG/releases/v0.1.0/windows/yasggctl.zip)
+* [OS X 64 bit](http://nomnomnom.github.io/YASGG/releases/v0.1.0/osx_64/yasggctl.zip)
+* [Linux 64 bit](http://nomnomnom.github.io/YASGG/releases/v0.1.0/linux_64/yasggctl.zip)
 
 ### PyPI
 
