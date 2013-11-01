@@ -7,8 +7,8 @@ YASGG
 
 YASGG is a static gallery generator with optional encryption support written in python.
 
-If a passowrd is chossen, the gallery generator encrypts the images with AES 256 bit.
-On the browser side the decryption process is done by the chossen password in JavaScript.
+If a password is chosen, the gallery generator encrypts the images with AES 256 bit.
+On the browser side the decryption process is done by the chosen password in JavaScript.
 As encrypted you can upload your gallery to any service that delivers static content like GitHub Pages, Amazon S3,
 Dropbox, Google Drive and so on with no privacy concerns.
 
@@ -30,6 +30,7 @@ If you are familiar with python pip, pip this is the recommended way to install.
 
 ### Prebuilt binaries (there is a yasggctl binary inside the zip. Run it from the command-line.)
 
+* [Windows](http://nomnomnom.github.io/YASGG/releases/v0.1.0/windows/yasggctl.zip)
 * [OS X 64 bit](http://nomnomnom.github.io/YASGG/releases/v0.1.0/osx_64/yasggctl.zip)
 * [Linux 64 bit](http://nomnomnom.github.io/YASGG/releases/v0.1.0/linux_64/yasggctl.zip)
 
