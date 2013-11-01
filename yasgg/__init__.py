@@ -1,9 +1,6 @@
 #-*- coding: utf-8 -*-
 import logging
 
-from tendo import colorer
-
-
 VERSION = (0, 1, 0, 'final', 1)
 LOG_LEVEL = logging.DEBUG
 

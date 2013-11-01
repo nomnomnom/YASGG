@@ -30,7 +30,9 @@ Dropbox, Google Drive and so on with no privacy concerns.
     pip install yasgg
     yasggctl -h
 
-### Prebuilt binaries
+### Prebuilt binaries (there is a yasggctl binary inside the zip. Run it from the command-line.)
+
+* OS X [64 bit](https://raw.github.com/nomnomnom/yasgg/master/releases/v0.1.0/osx_64/yasggctl.zip)
 
 ### From source
 
@@ -40,6 +42,8 @@ Dropbox, Google Drive and so on with no privacy concerns.
     yasgg/bin/yasggctl -h
 
 ## Example
+
+The build command creates a new album the current working directory.
 
     yasggctl build --recrusive 1 --photos-import-dir /tmp/photos_dir_2_import --album-name "YASGG demo album" -p 21f3a7f6373ccb42631b5671db4f5a5a60aed6dedf8e7b71d27e55288f41f6dc
     cd yasgg_demo_album
@@ -53,7 +57,7 @@ Dropbox, Google Drive and so on with no privacy concerns.
 
 
     Build command:
-      Creates a new album.
+      Creates a new album in the current working directory.
       Example: yasggctl build --recrusive 1 --photos-import-dir ./tests/sample --album-name "foo bar" --theme default
 
       -n <ablum-name>, --album-name <album-name>                        Name of the new album.

@@ -9,7 +9,7 @@ Usage: yasggctl build -n <album-name> -i <photos-import-dir> [-t <theme>] [-p <p
 
 
 Build command:
-  Creates a new album.
+  Creates a new album in the current working directory.
   Example: yasggctl build --recrusive 1 --photos-import-dir ./tests/sample --album-name "foo bar" --theme default
 
   -n <ablum-name>, --album-name <album-name>                        Name of the new album.
