@@ -26,11 +26,10 @@ Dropbox, Google Drive and so on with no privacy concerns.
 ## Installation
 
 There a three ways to install YASGG.
-If you know python pip, pip this is the recommended way to install. Otherwise check the prebuilt binaries.
+If you are familiar with python pip, pip this is the recommended way to install. Otherwise check the prebuilt binaries.
 
 ### Prebuilt binaries (there is a yasggctl binary inside the zip. Run it from the command-line.)
 
-* [Windows](http://nomnomnom.github.io/YASGG/releases/v0.1.0/windows/yasggctl.zip)
 * [OS X 64 bit](http://nomnomnom.github.io/YASGG/releases/v0.1.0/osx_64/yasggctl.zip)
 * [Linux 64 bit](http://nomnomnom.github.io/YASGG/releases/v0.1.0/linux_64/yasggctl.zip)
 
