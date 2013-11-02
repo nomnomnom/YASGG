@@ -97,9 +97,12 @@ class Commands(object):
                 continue
             photo = Photo(image_file_original=photo_2_import, album=album)
             exif_date = photo.exif_date
-            if not exif_date:
+            if exif_date:
+                photos[exif_date + photo_2_import] = photo_2_import
+            else:
                 exif_date_for_all_photos = False
-            photos[exif_date + photo_2_import] = photo_2_import
+                photos[photo_2_import] = photo_2_import
+
 
         # if there is not an exif date on all photos, use path instead
         if not exif_date_for_all_photos:
