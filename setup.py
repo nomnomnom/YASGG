@@ -22,11 +22,12 @@ setup(
     install_requires=[
         'Jinja2==2.7.1',
         'MarkupSafe==0.18',
-        'Pillow==2.1.0',
-        'beautifulsoup4==4.3.1',
+        'Pillow==2.2.1',
+        'YASGG==0.1',
+        'beautifulsoup4==4.3.2',
         'docopt==0.6.1',
         'jac==0.9',
-        'pycrypto==2.6',
+        'pycrypto==2.6.1',
         'tendo==0.2.4',
         'wsgiref==0.1.2'
     ],
