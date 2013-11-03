@@ -79,7 +79,8 @@ The build command creates a new album the current working directory.
 [Beerware](https://raw.github.com/nomnomnom/yasgg/master/LICENSE)
 
 ## Contact
-nomnomnom [at] secure-mail.cc
+* [@x3_nom](https://twitter.com/x3_nom)
+* nomnomnom [at] secure-mail.cc
 
 ---
 Enjoy!
