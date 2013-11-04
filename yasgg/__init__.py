@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 import logging
 
-VERSION = (0, 1, 2, 'final', 1)
+VERSION = (0, 1, 3, 'final', 1)
 LOG_LEVEL = logging.DEBUG
 
 
