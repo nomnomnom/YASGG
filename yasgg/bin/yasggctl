@@ -103,12 +103,11 @@ class Commands(object):
                 exif_date_for_all_photos = False
                 photos[photo_2_import] = photo_2_import
 
-
         # if there is not an exif date on all photos, use path instead
         if not exif_date_for_all_photos:
             for photo_key, photo_file in photos.items():
-                photos[photo_file] = photo_file
                 del photos[photo_key]
+                photos[photo_file] = photo_file
 
         photos_for_tpl = []
         for photo_key in sorted(photos.iterkeys()):
