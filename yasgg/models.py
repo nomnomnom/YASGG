@@ -142,7 +142,11 @@ class Photo(object):
         new_dimensions = (int(round(cur_width * ratio)),
                           int(round(cur_height * ratio)))
         img.thumbnail(new_dimensions, Image.ANTIALIAS)
-        img.save(self.thumbnail_file, 'jpeg', quality='keep', optimize=True, progressive=True)
+        if img.format == 'JPEG':
+            quality = 'keep'
+        else:
+            quality = 100
+        img.save(self.thumbnail_file, 'jpeg', quality=quality, optimize=True, progressive=True)
         size = img.size
 
         # encrypt if requested
@@ -163,7 +167,11 @@ class Photo(object):
 
         img = Image.open(self.image_file_original)
         img.thumbnail([1920, 1080], Image.ANTIALIAS)
-        img.save(self.image_file, 'jpeg', quality='keep', optimize=True, progressive=True)
+        if img.format == 'JPEG':
+            quality = 'keep'
+        else:
+            quality = 100
+        img.save(self.image_file, 'jpeg', quality=quality, optimize=True, progressive=True)
         size = img.size
 
         # encrypt if requested
