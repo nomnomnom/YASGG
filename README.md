@@ -5,7 +5,7 @@ YASGG
 
 ## Overview
 
-YASGG is a static gallery generator with optional encryption support written in python.
+YASGG is a static gallery generator with encryption support written in python.
 
 If a password is chosen, the gallery generator encrypts the images with AES 256 bit.
 On the browser side the decryption process is done by the chosen password in JavaScript.
