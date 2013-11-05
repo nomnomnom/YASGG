@@ -39,7 +39,7 @@ Dropbox, Google Drive and so on with no privacy concerns.
 
 ## Example
 
-The build command creates a new album the current working directory.
+The build command creates a new album in the current working directory.
 
     yasggctl build --recrusive 1 --photos-import-dir /tmp/photos_dir_2_import --album-name "YASGG demo album" -p 21f3a7f6373ccb42631b5671db4f5a5a60aed6dedf8e7b71d27e55288f41f6dc
     cd yasgg_demo_album
