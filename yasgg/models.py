@@ -4,9 +4,11 @@ import os
 import re
 
 from PIL import Image
+import PIL
 from PIL.ExifTags import TAGS
 from Crypto import Random
 from Crypto.Cipher import AES
+from PIL.ImageFile import ImageFile
 
 from .crypto import AESCipher
 from . import logger
@@ -132,24 +134,34 @@ class Photo(object):
                 return file_encrypted
 
     def create_thumbnail(self):
+        """ Takes an image, resizes the longest size to thumbnail_size and crops the middle. """
+
         logger.info('Creating thumbnail %s' % (self.thumbnail_file))
 
-        height = 300.0
+        thumbnail_size = 600
 
         img = Image.open(self.image_file_original)
-        cur_width, cur_height = img.size
-        ratio = height / cur_height
-        new_dimensions = (int(round(cur_width * ratio)),
-                          int(round(cur_height * ratio)))
-        img.thumbnail(new_dimensions, Image.ANTIALIAS)
+        img_ratio = img.size[0] / float(img.size[1])
+
+        if img_ratio < 1:  # Portrait
+            img = img.resize((thumbnail_size, int(round(thumbnail_size * img.size[1] / img.size[0]))), Image.ANTIALIAS)
+            box = (0, int(round((img.size[1] - thumbnail_size) / 2)), img.size[0], int(round((img.size[1] + thumbnail_size) / 2)))
+            img = img.crop(box)
+        elif img_ratio > 1:  # Landscape
+            img = img.resize((int(round(thumbnail_size * img.size[0] / img.size[1])), thumbnail_size), Image.ANTIALIAS)
+            box = (int(round((img.size[0] - thumbnail_size) / 2)), 0, int(round((img.size[0] + thumbnail_size) / 2)), img.size[1])
+            img = img.crop(box)
+        else:  # Square (doesn't need to be cropped)
+            img = img.resize((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
+
         if img.format == 'JPEG':
             quality = 'keep'
         else:
             quality = 100
         img.save(self.thumbnail_file, 'jpeg', quality=quality, optimize=True, progressive=True)
-        size = img.size
+        thumbnail_size = img.size
 
-        # encrypt if requested
+        # Encrypt if requested
         if self.album.password:
             thumbnail_file = Photo.__encrypt(file_2_encrypt=self.thumbnail_file, album=self.album)
             os.unlink(self.thumbnail_file)
@@ -158,8 +170,8 @@ class Photo(object):
 
         return {
             'thumbnail_file': thumbnail_file,
-            'thumbnail_width': size[0],
-            'thumbnail_height': size[1]
+            'thumbnail_width': thumbnail_size[0],
+            'thumbnail_height': thumbnail_size[1]
         }
 
     def provide(self):
