@@ -4,11 +4,11 @@ import os
 import re
 
 from PIL import Image
-import PIL
 from PIL.ExifTags import TAGS
 from Crypto import Random
 from Crypto.Cipher import AES
-from PIL.ImageFile import ImageFile
+
+from zipfile import ZipFile
 
 from .crypto import AESCipher
 from . import logger
@@ -41,8 +41,10 @@ class Theme(object):
 
 
 class Album(object):
+    name = None
     basedir = None
     photos_dir = None
+    photos = {}
     assets_dir_name = 'assets'
     html_file = None
     password = None
@@ -52,7 +54,8 @@ class Album(object):
     def assets_dir(self):
         return self.basedir + self.assets_dir_name + os.sep
 
-    def __init__(self, basedir, password=None):
+    def __init__(self, basedir, password=None, name=None):
+        self.name = name
         self.basedir = basedir
         self.photos_dir = '%sphotos%s' % (self.basedir, os.sep)
         if not os.path.exists(self.photos_dir):
@@ -66,6 +69,14 @@ class Album(object):
         if self.password:
             # md5 hash password to get len 32 key
             self.password_hashed = hashlib.md5(self.password).hexdigest()
+
+    def create_zipped_version(self):
+        zip_file_name = '%s%s.zip' % (self.photos_dir, self.name)
+        with ZipFile(zip_file_name, 'w') as album_zip:
+            for file_name in self.photos.itervalues():
+                arc_name = file_name.split('/').pop()
+                album_zip.write(file_name, arcname=arc_name)
+        return zip_file_name
 
 
 class Photo(object):
@@ -143,11 +154,11 @@ class Photo(object):
         img = Image.open(self.image_file_original)
         img_ratio = img.size[0] / float(img.size[1])
 
-        if img_ratio < 1:  # Portrait
+        if img_ratio < 1:  # Portrait (crop vertical middle)
             img = img.resize((thumbnail_size, int(round(thumbnail_size * img.size[1] / img.size[0]))), Image.ANTIALIAS)
             box = (0, int(round((img.size[1] - thumbnail_size) / 2)), img.size[0], int(round((img.size[1] + thumbnail_size) / 2)))
             img = img.crop(box)
-        elif img_ratio > 1:  # Landscape
+        elif img_ratio > 1:  # Landscape (crop horizontal middle)
             img = img.resize((int(round(thumbnail_size * img.size[0] / img.size[1])), thumbnail_size), Image.ANTIALIAS)
             box = (int(round((img.size[0] - thumbnail_size) / 2)), 0, int(round((img.size[0] + thumbnail_size) / 2)), img.size[1])
             img = img.crop(box)
