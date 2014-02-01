@@ -3,7 +3,7 @@
 """
 YASGG - Yet another static gallery generator. CLI.
 
-Usage: yasggctl build -n <album-name> -i <photos-import-dir> [-t <theme>] [-p <password>] [-r <recrusive>]
+Usage: yasggctl build -i <photos-import-dir> [-t <theme>] [-p <password>] [-r <recrusive>]
        yasggctl serve [-o <port>] [-b <bind>]
        yasggctl [-h] [-v]
 
@@ -12,7 +12,6 @@ Build command:
   Creates a new album in the current working directory.
   Example: yasggctl build --recrusive 1 --photos-import-dir ./tests/sample --album-name "foo bar" --theme default
 
-  -n <ablum-name>, --album-name <album-name>                        Name of the new album.
   -i <photos-import-dir>, --photos-import-dir <photos-import-dir>   Directory of photos to import.
   -p <password>, --password <password>                              Use encryption of images. Use a _STRONG_ password!
   -r {0,1}, --recrusive                                             Search recrusive for photos into --photos-import-dir [default: 0]
@@ -64,8 +63,7 @@ class Commands(object):
             logger.error('Password is too short. Use min 8 characters.')
             return
 
-        album = Album(name=args['--album-name'], password=args['--password'],
-                      photos_import_dir=args['--photos-import-dir'])
+        album = Album(import_dir=args['--photos-import-dir'])
         album.import_photos()
         album.create_zipped_version()
 
@@ -82,7 +80,7 @@ class Commands(object):
         # Write html file
         with open(album.html_file, 'wb') as html_file:
             logger.info('Writing html file %s' % (album.html_file))
-            html = template.render(photos=album.photos_for_tpl, password=album.password, album_name=album.name,
+            html = template.render(photos=album.photos_for_tpl, password=album.password, album_name=album.title,
                                    timestamp=int(time.time()), zip_file=album.zip_file)
             html_file.write(html.encode('utf-8'))
 
