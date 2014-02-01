@@ -28,7 +28,36 @@ img {
     margin: 0;
     float: left;
     width: 20%;
-    /* TODO: Define media queries. (More thumbnails on large, less on small viewport.) */
+}
+@media (max-width: 400px) {
+    .thumbnail-container {
+        width: 50%;
+    }
+}
+@media (min-width: 401px) and (max-width: 800px) {
+    .thumbnail-container {
+        width: 33.33%;
+    }
+}
+@media (min-width: 801px) and (max-width: 1200px) {
+    .thumbnail-container {
+        width: 25%;
+    }
+}
+@media (min-width: 1201px) and (max-width: 1600px) {
+    .thumbnail-container {
+        width: 20%;
+    }
+}
+@media (min-width: 1601px) and (max-width: 2000px) {
+    .thumbnail-container {
+        width: 12.5%;
+    }
+}
+@media (min-width: 2001px) {
+    .thumbnail-container {
+        width: 10%;
+    }
 }
 .thumbnail-container a {
     display: block;
