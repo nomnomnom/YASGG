@@ -77,7 +77,7 @@ class Commands(object):
 
         # Copy asset data needed for all themes
         assets_dir_for_all = '%s%s' % (os.path.join(theme.basedir, '..', '_assets_for_all_themes'), os.sep)
-        copytree(assets_dir_for_all, '%s%s' % (album.basedir, '_assets_for_all_themes'))
+        copytree(assets_dir_for_all, '%s%s' % (album.basedir, 'assets/crypto'))
 
         # Write html file
         with open(album.html_file, 'wb') as html_file:
