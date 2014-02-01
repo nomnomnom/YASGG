@@ -159,7 +159,6 @@ class Photo(object):
         else:
             quality = 100
         img.save(self.thumbnail_file, 'jpeg', quality=quality, optimize=True, progressive=True)
-        thumbnail_size = img.size
 
         # Encrypt if requested
         if self.album.password:
@@ -169,9 +168,7 @@ class Photo(object):
             thumbnail_file = self.thumbnail_file
 
         return {
-            'thumbnail_file': thumbnail_file,
-            'thumbnail_width': thumbnail_size[0],
-            'thumbnail_height': thumbnail_size[1]
+            'thumbnail_file': thumbnail_file
         }
 
     def provide(self):
