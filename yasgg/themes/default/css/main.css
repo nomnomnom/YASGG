@@ -6,11 +6,22 @@
     box-shadow: 0 2px 2px 1px #333;
     z-index: 10;
 }
+.download-link {
+    display: inline-block;
+    float: right;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 40px;
+    padding-right: 20px;
+    text-align: right;
+    text-decoration: none;
+}
 
 a {
     color: rgb(204, 204, 204);
     font-size: 12px;
 }
+
 
 #password-dialog {
     position: relative;
