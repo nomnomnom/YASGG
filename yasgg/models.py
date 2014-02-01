@@ -1,17 +1,20 @@
 #-*- coding: utf-8 -*-
+import codecs
 import sys
 import os
 import hashlib
 import re
+import markdown
 
 from PIL import Image
 from PIL.ExifTags import TAGS
 from Crypto import Random
 from Crypto.Cipher import AES
+from slugify import slugify
 from zipfile import ZipFile
 
 from yasgg.settings import IMAGE_FILE_EXTENSIONS_2_IMPORT
-from yasgg.utils import walkdir
+from yasgg.utils import walkdir, ensure_dir
 
 from .crypto import AESCipher
 from . import logger
@@ -44,46 +47,95 @@ class Theme(object):
 
 
 class Album(object):
-    name = None  # TODO: As soon as the info-file for albums is available this name can be any utf-8 string.
-    basedir = None  # TODO: This should be a slug version of self.name
+    ALBUM_INFO_FILE = 'info.md'
+
+    # Visible meta data
+    title = None
+    slug = None
+    basedir = None
+    description = None
+    thumbnail = None
+    date_range = None  # TODO: Get date range from info file, else from exif data.
+
+    # File handling
+    import_dir = None
     photos_dir = None
     photos = {}
+    zip_file = None
     assets_dir_name = 'assets'  # TODO: This should be non-relevant for the album, shouldn't it?
-    html_file = None
+
+    # Crypto
     password = None
     password_hashed = None
-    photos_import_dir = None
-    zip_file = None
+
+    # Template
+    html_file = None
     photos_for_tpl = []
 
     @property
     def assets_dir(self):
         return self.basedir + self.assets_dir_name + os.sep
 
-    def __init__(self, name, photos_import_dir, password=None):
-        self.name = name
-        if os.path.exists(photos_import_dir):
-            self.photos_import_dir = photos_import_dir
-        else:  # Exit yasgg if there is no directory to import.
-            logger.error('The photos dir %s does not exist!' % photos_import_dir)
+    def __init__(self, import_dir):
+        if os.path.exists(import_dir):
+            self.import_dir = import_dir
+        else:
+            logger.error('The directory to import (%s) does not exist. No album creation is possible and I\'ve to exit' % import_dir)
             sys.exit(0)
 
-        # TODO: The basedir name creation should be a proper slugify
-        self.basedir = os.path.abspath('.%s%s' % (os.sep, self.name.lower().replace(' ', '_'))) + os.sep
-        if not os.path.exists(self.basedir):
-            os.mkdir(self.basedir)
+        self.get_self_informed()
+
+        ensure_dir(self.basedir)
+        ensure_dir(self.photos_dir)
+
+    def get_self_informed(self):
+        """
+        Collects all info an album can get from self.ALBUM_INFO_FILE as far as possible
+        and fills the rest with fallback values.
+        """
+
+        # Look for the album info file.
+        info_file = os.path.join(self.import_dir, self.ALBUM_INFO_FILE)
+        if os.path.isfile(info_file):
+            with codecs.open(info_file, "r", "utf-8") as f:
+                text = f.read()
+            md = markdown.Markdown(extensions=['meta'])
+            html = md.convert(text)
+
+            md_title = md.Meta.get('title', [''])[0]
+            md_description = html
+            md_thumbnail = md.Meta.get('thumbnail', [''])[0]
+            md_date = md.Meta.get('date', [''])[0]
+            md_password = md.Meta.get('password', [''])[0]
+
+            # Set values from album info file
+            if md_title:
+                self.title = md_title
+            if md_description:
+                self.description = md_description
+            if md_thumbnail:
+                self.thumbnail = md_thumbnail
+            if md_date:
+                self.date_range = md_date
+            if md_password:
+                self.password = md_password
+
+        # Fill with fallback values
+        if not self.title:
+            self.title = self.import_dir.split(os.sep).pop()
+
+        # Create slug
+        self.slug = slugify(self.title)
+
+        # Set directories
+        self.basedir = os.path.abspath('.%s%s' % (os.sep, self.slug)) + os.sep
         self.photos_dir = '%sphotos%s' % (self.basedir, os.sep)
-        if not os.path.exists(self.photos_dir):
-            os.mkdir(self.photos_dir)
-        # Removed as a nasty fix for the copytree problem (if the copytree destination exists, copytree won't copy ...)
-        #if not os.path.exists(self.assets_dir):
-        #    os.mkdir(self.assets_dir)
 
-        self.html_file = '%sindex.html' % (self.basedir)
-        self.password = password
+        # Set template file
+        self.html_file = '%sindex.html' % self.basedir
 
+        # Build md5 hash of password to get len 32 key
         if self.password:
-            # md5 hash password to get len 32 key
             self.password_hashed = hashlib.md5(self.password).hexdigest()
 
     def create_zipped_version(self):
@@ -92,7 +144,7 @@ class Album(object):
         """
 
         if not self.password:
-            zip_file_name = '%s%s.zip' % (self.photos_dir, self.name)
+            zip_file_name = '%s%s.zip' % (self.photos_dir, self.slug)
 
             with ZipFile(zip_file_name, 'w') as album_zip:
                 for file_name in self.photos.itervalues():
@@ -103,10 +155,10 @@ class Album(object):
             self.zip_file = os.sep.join(zip_file_name.split(os.sep)[-2:])
 
     def import_photos(self):
-        logger.info('Searching for photos in %s' % self.photos_import_dir)
+        logger.info('Searching for photos in %s' % self.import_dir)
         self.photos = {}
         exif_date_for_all_photos = True
-        for photo_2_import in walkdir(dir_2_walk=self.photos_import_dir):
+        for photo_2_import in walkdir(dir_2_walk=self.import_dir):
             extension = os.path.splitext(photo_2_import)[1][1:]
             if extension.lower() not in IMAGE_FILE_EXTENSIONS_2_IMPORT:
                 continue

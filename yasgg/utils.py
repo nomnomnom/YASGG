@@ -31,7 +31,8 @@ def walkdir(dir_2_walk, recrusive=True):
             yield fullpath
 
 
-def checkdir(path):
+def ensure_dir(path):
     """Create the dir if it does not exist"""
+
     if not os.path.isdir(path):
         os.makedirs(path)
