@@ -78,16 +78,16 @@ class Commands(object):
         theme = Theme(args['--theme'])
         template = Template(codecs.open(theme.template, 'r', 'utf8').read())
 
-        # copy theme data
+        # Copy theme data
         copytree(theme.basedir, album_basedir)
 
-        # copy asset data neededfor all themes
+        # Copy asset data needed for all themes
         assets_dir_for_all = '%s%s' % (os.path.join(theme.basedir, '..', '_assets_for_all_themes'), os.sep)
         copytree(assets_dir_for_all, '%s%s' % (album_basedir, '_assets_for_all_themes'))
 
-        album = Album(basedir=album_basedir, password=args['--password'])
+        album = Album(basedir=album_basedir, password=args['--password'], name=args['--album-name'])
 
-        # import photos
+        # Import photos
         logger.info('Searching for photos in %s' % (args['--photos-import-dir']))
         photos = {}
         exif_date_for_all_photos = True
@@ -103,11 +103,22 @@ class Commands(object):
                 exif_date_for_all_photos = False
                 photos[photo_2_import] = photo_2_import
 
-        # if there is not an exif date on all photos, use path instead
+        # If there is not an exif date on all photos, use path instead
         if not exif_date_for_all_photos:
             for photo_key, photo_file in photos.items():
                 del photos[photo_key]
                 photos[photo_file] = photo_file
+
+        # TODO: Photos should be known to the album they are belonging to.
+        # This is just a temporary solution
+        album.photos = photos
+
+        # Create zip of original pictures if album is not encrypted.
+        zip_file = None
+        if not use_encryption:
+            zip_file = album.create_zipped_version()
+            # Create relative path for zip file.
+            zip_file = os.sep.join(zip_file.split(os.sep)[-2:])
 
         photos_for_tpl = []
         for photo_key in sorted(photos.iterkeys()):
@@ -131,7 +142,7 @@ class Commands(object):
         with open(album.html_file, 'wb') as html_file:
             logger.info('Writing html file %s' % (album.html_file))
             html = template.render(photos=photos_for_tpl, password=args['--password'], album_name=args['--album-name'],
-                                   timestamp=int(time.time()))
+                                   timestamp=int(time.time()), zip_file=zip_file)
             html_file.write(html.encode('utf-8'))
 
     def serve(self, args):
