@@ -66,83 +66,28 @@ class Commands(object):
             logger.error('Password is too short. Use min 8 characters.')
             return
 
-        album_basedir = os.path.abspath('.%s%s' % (os.sep, args['--album-name'].lower().replace(' ', '_'))) + os.sep
-        if os.path.exists(album_basedir):
-            logger.error('The album %s already exists!' % (album_basedir))
-            return
-
-        if not os.path.exists(args['--photos-import-dir']):
-            logger.error('The photos dir %s does not exist!' % (args['--photos-import-dir']))
-            return
+        album = Album(name=args['--album-name'], password=args['--password'],
+                      photos_import_dir=args['--photos-import-dir'])
+        album.import_photos()
+        album.create_zipped_version()
 
         theme = Theme(args['--theme'])
+        print theme.basedir
+        print album.basedir
         template = Template(codecs.open(theme.template, 'r', 'utf8').read())
 
         # Copy theme data
-        copytree(theme.basedir, album_basedir)
+        #copytree(theme.basedir, album.basedir)
 
         # Copy asset data needed for all themes
         assets_dir_for_all = '%s%s' % (os.path.join(theme.basedir, '..', '_assets_for_all_themes'), os.sep)
-        copytree(assets_dir_for_all, '%s%s' % (album_basedir, '_assets_for_all_themes'))
+        copytree(assets_dir_for_all, '%s%s' % (album.basedir, '_assets_for_all_themes'))
 
-        album = Album(basedir=album_basedir, password=args['--password'], name=args['--album-name'])
-
-        # Import photos
-        logger.info('Searching for photos in %s' % (args['--photos-import-dir']))
-        photos = {}
-        exif_date_for_all_photos = True
-        for photo_2_import in walkdir(dir_2_walk=args['--photos-import-dir'], recrusive=int(args['--recrusive'])):
-            extension = os.path.splitext(photo_2_import)[1][1:]
-            if extension.lower() not in IMAGE_FILE_EXTENSIONS_2_IMPORT:
-                continue
-            photo = Photo(image_file_original=photo_2_import, album=album)
-            exif_date = photo.exif_date
-            if exif_date:
-                photos[exif_date + photo_2_import] = photo_2_import
-            else:
-                exif_date_for_all_photos = False
-                photos[photo_2_import] = photo_2_import
-
-        # If there is not an exif date on all photos, use path instead
-        if not exif_date_for_all_photos:
-            for photo_key, photo_file in photos.items():
-                del photos[photo_key]
-                photos[photo_file] = photo_file
-
-        # TODO: Photos should be known to the album they are belonging to.
-        # This is just a temporary solution
-        album.photos = photos
-
-        # Create zip of original pictures if album is not encrypted.
-        zip_file = None
-        if not use_encryption:
-            zip_file = album.create_zipped_version()
-            # Create relative path for zip file.
-            zip_file = os.sep.join(zip_file.split(os.sep)[-2:])
-
-        photos_for_tpl = []
-        for photo_key in sorted(photos.iterkeys()):
-            logger.debug('Processing %s' % (photo_2_import))
-            photo_2_import = photos[photo_key]
-            photo = Photo(image_file_original=photo_2_import, album=album)
-
-            # create thumbnail and main image
-            thumbnail_data = photo.create_thumbnail()
-            image_file_data = photo.provide()
-
-            # make photo path relative
-            thumbnail_data['thumbnail_file'] = os.sep.join(thumbnail_data['thumbnail_file'].split(os.sep)[-2:])
-            image_file_data['file'] = os.sep.join(image_file_data['file'].split(os.sep)[-2:])
-
-            # merge two data dicts into one
-            tpl_photo_data = dict(thumbnail_data.items() + image_file_data.items())
-
-            photos_for_tpl.append(tpl_photo_data)
-            # write html file
+        # Write html file
         with open(album.html_file, 'wb') as html_file:
             logger.info('Writing html file %s' % (album.html_file))
-            html = template.render(photos=photos_for_tpl, password=args['--password'], album_name=args['--album-name'],
-                                   timestamp=int(time.time()), zip_file=zip_file)
+            html = template.render(photos=album.photos_for_tpl, password=album.password, album_name=album.name,
+                                   timestamp=int(time.time()), zip_file=album.zip_file)
             html_file.write(html.encode('utf-8'))
 
     def serve(self, args):

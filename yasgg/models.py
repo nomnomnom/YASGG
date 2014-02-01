@@ -9,6 +9,9 @@ from Crypto import Random
 from Crypto.Cipher import AES
 
 from zipfile import ZipFile
+import sys
+from yasgg.settings import IMAGE_FILE_EXTENSIONS_2_IMPORT
+from yasgg.utils import walkdir
 
 from .crypto import AESCipher
 from . import logger
@@ -41,22 +44,34 @@ class Theme(object):
 
 
 class Album(object):
-    name = None
-    basedir = None
+    name = None  # TODO: As soon as the info-file for albums is available this name can be any utf-8 string.
+    basedir = None  # TODO: This should be a slug version of self.name
     photos_dir = None
     photos = {}
     assets_dir_name = 'assets'
     html_file = None
     password = None
     password_hashed = None
+    photos_import_dir = None
+    zip_file = None
+    photos_for_tpl = []
 
     @property
     def assets_dir(self):
         return self.basedir + self.assets_dir_name + os.sep
 
-    def __init__(self, basedir, password=None, name=None):
+    def __init__(self, name, photos_import_dir, password=None):
         self.name = name
-        self.basedir = basedir
+        if os.path.exists(photos_import_dir):
+            self.photos_import_dir = photos_import_dir
+        else:  # Exit yasgg if there is no directory to import.
+            logger.error('The photos dir %s does not exist!' % photos_import_dir)
+            sys.exit(0)
+
+        # TODO: The basedir name creation should be a proper slugify
+        self.basedir = os.path.abspath('.%s%s' % (os.sep, self.name.lower().replace(' ', '_'))) + os.sep
+        if not os.path.exists(self.basedir):
+            os.mkdir(self.basedir)
         self.photos_dir = '%sphotos%s' % (self.basedir, os.sep)
         if not os.path.exists(self.photos_dir):
             os.mkdir(self.photos_dir)
@@ -71,12 +86,59 @@ class Album(object):
             self.password_hashed = hashlib.md5(self.password).hexdigest()
 
     def create_zipped_version(self):
-        zip_file_name = '%s%s.zip' % (self.photos_dir, self.name)
-        with ZipFile(zip_file_name, 'w') as album_zip:
-            for file_name in self.photos.itervalues():
-                arc_name = file_name.split('/').pop()
-                album_zip.write(file_name, arcname=arc_name)
-        return zip_file_name
+        """
+        Creates a zip of all self.photos if self is not encrypted and returns the relative path of the zip
+        """
+
+        if not self.password:
+            zip_file_name = '%s%s.zip' % (self.photos_dir, self.name)
+            with ZipFile(zip_file_name, 'w') as album_zip:
+                for file_name in self.photos.itervalues():
+                    arc_name = file_name.split('/').pop()
+                    album_zip.write(file_name, arcname=arc_name)
+
+            # Make relative path
+            zip_file_name = os.sep.join(zip_file_name.split(os.sep)[-2:])
+
+    def import_photos(self):
+        logger.info('Searching for photos in %s' % self.photos_import_dir)
+        self.photos = {}
+        exif_date_for_all_photos = True
+        for photo_2_import in walkdir(dir_2_walk=self.photos_import_dir):
+            extension = os.path.splitext(photo_2_import)[1][1:]
+            if extension.lower() not in IMAGE_FILE_EXTENSIONS_2_IMPORT:
+                continue
+            photo = Photo(image_file_original=photo_2_import, album=self)
+            exif_date = photo.exif_date
+            if exif_date:
+                self.photos[exif_date + photo_2_import] = photo_2_import
+            else:
+                exif_date_for_all_photos = False
+                self.photos[photo_2_import] = photo_2_import
+
+        # If there is not an exif date on all photos, use path instead
+        if not exif_date_for_all_photos:
+            for photo_key, photo_file in self.photos.items():
+                del self.photos[photo_key]
+                self.photos[photo_file] = photo_file
+
+        for photo_key in sorted(self.photos.iterkeys()):
+            logger.debug('Processing %s' % (photo_2_import))
+            photo_2_import = self.photos[photo_key]
+            photo = Photo(image_file_original=photo_2_import, album=self)
+
+            # create thumbnail and main image
+            thumbnail_data = photo.create_thumbnail()
+            image_file_data = photo.provide()
+
+            # make photo path relative
+            thumbnail_data['thumbnail_file'] = os.sep.join(thumbnail_data['thumbnail_file'].split(os.sep)[-2:])
+            image_file_data['file'] = os.sep.join(image_file_data['file'].split(os.sep)[-2:])
+
+            # merge two data dicts into one
+            tpl_photo_data = dict(thumbnail_data.items() + image_file_data.items())
+
+            self.photos_for_tpl.append(tpl_photo_data)
 
 
 class Photo(object):
