@@ -28,10 +28,12 @@ img {
     margin: 0;
     float: left;
     width: 20%;
+    /* TODO: Define media queries. (More thumbnails on large, less on small viewport.) */
 }
 .thumbnail-container a {
-    width: 100%;
     display: block;
+    line-height: 0;
+    width: 100%;
 }
 
 .hide {
