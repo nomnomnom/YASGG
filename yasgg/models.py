@@ -4,11 +4,9 @@ import os
 import re
 
 from PIL import Image
-import PIL
 from PIL.ExifTags import TAGS
 from Crypto import Random
 from Crypto.Cipher import AES
-from PIL.ImageFile import ImageFile
 
 from .crypto import AESCipher
 from . import logger
@@ -143,11 +141,11 @@ class Photo(object):
         img = Image.open(self.image_file_original)
         img_ratio = img.size[0] / float(img.size[1])
 
-        if img_ratio < 1:  # Portrait
+        if img_ratio < 1:  # Portrait (crop vertical middle)
             img = img.resize((thumbnail_size, int(round(thumbnail_size * img.size[1] / img.size[0]))), Image.ANTIALIAS)
             box = (0, int(round((img.size[1] - thumbnail_size) / 2)), img.size[0], int(round((img.size[1] + thumbnail_size) / 2)))
             img = img.crop(box)
-        elif img_ratio > 1:  # Landscape
+        elif img_ratio > 1:  # Landscape (crop horizontal middle)
             img = img.resize((int(round(thumbnail_size * img.size[0] / img.size[1])), thumbnail_size), Image.ANTIALIAS)
             box = (int(round((img.size[0] - thumbnail_size) / 2)), 0, int(round((img.size[0] + thumbnail_size) / 2)), img.size[1])
             img = img.crop(box)
