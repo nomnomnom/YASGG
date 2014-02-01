@@ -10,7 +10,6 @@ class Gallery
   _lightbox_close_sel = '.lightbox-close'
   _thumbnail_enrypted_sel = '.thumbnail-img.encrypted'
   _key_cookie_name = 'yasgg_crypto_key'
-  _is_image_grid_initialized = false
   _use_crypto = false
   _crypto = undefined
 
@@ -51,13 +50,6 @@ class Gallery
     hash_components = window.location.hash.split '#'
     if hash_components.length > 1 and $.isNumeric(hash_components[1])
       $(_lightbox_open_sel + ':eq(' + hash_components[1] + ')').click()
-
-  _init_image_grid: ->
-    self = @
-    self._is_image_grid_initialized = true
-    $(_content_sel).isotope
-      itemSelector: _thumbnail_sel
-      layoutMode: 'fitRows'
 
   _init_password_dialog: ->
     self = @
@@ -177,8 +169,7 @@ class Gallery
           ).done (data) ->
             self._decrypt_image(img, data, 'src')
             images_decrypted_count++
-            if not self._is_image_grid_initialized and images_decrypted_count >= images_to_decrypt_count
-              self._init_image_grid()
+
       else
         self.password_set(null)
         password_ok = false

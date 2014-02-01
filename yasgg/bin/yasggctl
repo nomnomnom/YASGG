@@ -116,7 +116,7 @@ class Commands(object):
             photo = Photo(image_file_original=photo_2_import, album=album)
 
             # create thumbnail and main image
-            thumbnail_data = photo.create_thumbnail()
+            thumbnail_data = photo.resize_and_crop()
             image_file_data = photo.provide()
 
             # make photo path relative

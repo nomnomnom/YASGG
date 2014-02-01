@@ -4,9 +4,11 @@ import os
 import re
 
 from PIL import Image
+import PIL
 from PIL.ExifTags import TAGS
 from Crypto import Random
 from Crypto.Cipher import AES
+from PIL.ImageFile import ImageFile
 
 from .crypto import AESCipher
 from . import logger
@@ -142,6 +144,49 @@ class Photo(object):
         new_dimensions = (int(round(cur_width * ratio)),
                           int(round(cur_height * ratio)))
         img.thumbnail(new_dimensions, Image.ANTIALIAS)
+        if img.format == 'JPEG':
+            quality = 'keep'
+        else:
+            quality = 100
+        img.save(self.thumbnail_file, 'jpeg', quality=quality, optimize=True, progressive=True)
+        size = img.size
+
+        # encrypt if requested
+        if self.album.password:
+            thumbnail_file = Photo.__encrypt(file_2_encrypt=self.thumbnail_file, album=self.album)
+            os.unlink(self.thumbnail_file)
+        else:
+            thumbnail_file = self.thumbnail_file
+
+        return {
+            'thumbnail_file': thumbnail_file,
+            'thumbnail_width': size[0],
+            'thumbnail_height': size[1]
+        }
+
+    def resize_and_crop(self):
+        ImageFile.MAXBLOCK = 1024*1024
+        logger.info('Creating thumbnail %s' % (self.thumbnail_file))
+
+        size = (600, 600)
+
+        img = Image.open(self.image_file_original)
+        # Get current and desired ratio for the images
+        img_ratio = img.size[0] / float(img.size[1])
+        ratio = size[0] / float(size[1])
+        # The image is scaled/cropped vertically or horizontally depending on the ratio
+        if ratio > img_ratio:
+            img = img.resize((size[0], int(round(size[0] * img.size[1] / img.size[0]))), Image.ANTIALIAS)
+            box = (0, int(round((img.size[1] - size[1]) / 2)), img.size[0], int(round((img.size[1] + size[1]) / 2)))
+            img = img.crop(box)
+        elif ratio < img_ratio:
+            img = img.resize((int(round(size[1] * img.size[0] / img.size[1])), size[1]), Image.ANTIALIAS)
+            box = (int(round((img.size[0] - size[0]) / 2)), 0, int(round((img.size[0] + size[0]) / 2)), img.size[1])
+            img = img.crop(box)
+        else:
+            # If the scale is the same, we do not need to crop
+            img = img.resize((size[0], size[1]), Image.ANTIALIAS)
+
         if img.format == 'JPEG':
             quality = 'keep'
         else:

@@ -16,13 +16,12 @@
   {% for photo in photos %}
   <div class="thumbnail-container">
     <a class="lightbox{% if password %} encrypted{% endif %}"
-       {% if password %} href="#" data-src-encrypted="{{ photo.file }}"
+      {% if password %} href="#" data-src-encrypted="{{ photo.file }}"
       {% else %}href="{{photo.file }}"{% endif %}>
       <img class="loading thumbnail-img screen-small {% if password %} encrypted{% endif %}"
       {% if password %}data-src-encrypted="{{ photo.thumbnail_file }}"
       {% else %}src="{{photo.thumbnail_file }}"{% endif %}
-      width="{{ photo.thumbnail_width }}"
-      height="{{ photo.thumbnail_height }}"/>
+      width="100%" />
     </a>
   </div>
   {% endfor %}
@@ -41,7 +40,6 @@
 <script src="js/fullscreen.js?{{ timestamp }}" type="text/javascript"></script>
 <script src="js/gallery.js?{{ timestamp }}" type="text/javascript"></script>
 <script src="js/magnific-popup/jquery.magnific-popup.js?{{ timestamp }}" type="text/javascript"></script>
-<script src="js/jquery.isotope.js?{{ timestamp }}" type="text/javascript"></script>
 <script src="js/screenfull.js?{{ timestamp }}" type="text/javascript"></script>
 <script src="js/init.js?{{ timestamp }}" type="text/javascript"></script>
 
