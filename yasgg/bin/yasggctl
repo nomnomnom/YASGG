@@ -31,10 +31,11 @@ Global options:
   -h, --help                                                        Show this help message and exit.
   -v, --version                                                     Show program's version number and exit.
 """
-import codecs
-import os
-from shutil import copytree
 import sys
+import os
+import codecs
+from shutil import copytree
+
 import time
 
 from docopt import docopt
@@ -44,12 +45,9 @@ import webbrowser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + os.sep + '..' + os.sep + '..' + os.sep)
 
-
 from yasgg import get_version
 from yasgg import logger
-from yasgg.settings import IMAGE_FILE_EXTENSIONS_2_IMPORT
-from yasgg.utils import walkdir
-from yasgg.models import Photo, Album, Theme
+from yasgg.models import Album, Theme
 from yasgg.server import ThreadingSimpleServer
 
 
@@ -72,12 +70,10 @@ class Commands(object):
         album.create_zipped_version()
 
         theme = Theme(args['--theme'])
-        print theme.basedir
-        print album.basedir
         template = Template(codecs.open(theme.template, 'r', 'utf8').read())
 
         # Copy theme data
-        #copytree(theme.basedir, album.basedir)
+        copytree(theme.basedir, os.path.join(album.basedir, 'assets'))
 
         # Copy asset data needed for all themes
         assets_dir_for_all = '%s%s' % (os.path.join(theme.basedir, '..', '_assets_for_all_themes'), os.sep)

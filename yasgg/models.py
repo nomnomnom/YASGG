@@ -1,15 +1,15 @@
 #-*- coding: utf-8 -*-
-import hashlib
+import sys
 import os
+import hashlib
 import re
 
 from PIL import Image
 from PIL.ExifTags import TAGS
 from Crypto import Random
 from Crypto.Cipher import AES
-
 from zipfile import ZipFile
-import sys
+
 from yasgg.settings import IMAGE_FILE_EXTENSIONS_2_IMPORT
 from yasgg.utils import walkdir
 
@@ -48,7 +48,7 @@ class Album(object):
     basedir = None  # TODO: This should be a slug version of self.name
     photos_dir = None
     photos = {}
-    assets_dir_name = 'assets'
+    assets_dir_name = 'assets'  # TODO: This should be non-relevant for the album, shouldn't it?
     html_file = None
     password = None
     password_hashed = None
@@ -75,8 +75,9 @@ class Album(object):
         self.photos_dir = '%sphotos%s' % (self.basedir, os.sep)
         if not os.path.exists(self.photos_dir):
             os.mkdir(self.photos_dir)
-        if not os.path.exists(self.assets_dir):
-            os.mkdir(self.assets_dir)
+        # Removed as a nasty fix for the copytree problem (if the copytree destination exists, copytree won't copy ...)
+        #if not os.path.exists(self.assets_dir):
+        #    os.mkdir(self.assets_dir)
 
         self.html_file = '%sindex.html' % (self.basedir)
         self.password = password
@@ -92,13 +93,14 @@ class Album(object):
 
         if not self.password:
             zip_file_name = '%s%s.zip' % (self.photos_dir, self.name)
+
             with ZipFile(zip_file_name, 'w') as album_zip:
                 for file_name in self.photos.itervalues():
                     arc_name = file_name.split('/').pop()
                     album_zip.write(file_name, arcname=arc_name)
 
             # Make relative path
-            zip_file_name = os.sep.join(zip_file_name.split(os.sep)[-2:])
+            self.zip_file = os.sep.join(zip_file_name.split(os.sep)[-2:])
 
     def import_photos(self):
         logger.info('Searching for photos in %s' % self.photos_import_dir)
