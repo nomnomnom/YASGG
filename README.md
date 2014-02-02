@@ -32,7 +32,7 @@ Dropbox, Google Drive and so on with no privacy concerns.
 
 ### From source
 
-    git clone git@github.com:nomnomnom/yasgg.git
+    git clone git@github.com:nomnomnom/YASGG.git
     cd yasgg
     pip install -r requirements.txt
     yasgg/bin/yasggctl -h
